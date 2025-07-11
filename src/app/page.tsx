@@ -1,102 +1,138 @@
+"use client";
+
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [ip, setIp] = useState<string>("");
+  const [location, setLocation] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    async function fetchIpAndLocation() {
+      try {
+        const ipRes = await fetch("https://api.ipify.org?format=json");
+        const ipData = await ipRes.json();
+        setIp(ipData.ip);
+        const locRes = await fetch(`https://ipapi.co/${ipData.ip}/json/`);
+        const locData = await locRes.json();
+        setLocation(locData);
+      } catch (err) {
+        setIp("Error fetching IP");
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchIpAndLocation();
+  }, []);
+
+  const handleCopy = () => {
+    if (ip) {
+      navigator.clipboard.writeText(ip);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-white">
+      <header className="w-full flex items-center justify-center bg-[#70b990] text-white py-5 shadow-lg">
+        <div className="flex items-center gap-3">
+          <Image
+            src="/logo.jpg"
+            alt="Logo"
+            width={40}
+            height={40}
+            className="drop-shadow rounded-full"
+          />
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight drop-shadow">
+            What's My IP?
+          </h1>
         </div>
+      </header>
+      <main className="flex flex-1 flex-col items-center justify-center w-full px-2 sm:px-0">
+        <section className="w-full max-w-2xl bg-white dark:bg-[#222] rounded-2xl shadow-2xl p-6 sm:p-12 flex flex-col items-center gap-8 border border-[#70b990] dark:border-[#70b990] mt-6 sm:mt-10">
+          <h2 className="text-lg sm:text-xl font-semibold text-[#70b990] dark:text-[#70b990] mb-2 text-center">
+            Your Public IPv4 Address
+          </h2>
+          {loading ? (
+            <span className="text-gray-500 text-xl">Loading...</span>
+          ) : (
+            <>
+              <div className="flex flex-col items-center gap-3 w-full">
+                <span className="text-2xl sm:text-4xl font-mono font-bold text-[#70b990] bg-[#eaf7f2] px-4 sm:px-6 py-2 sm:py-3 rounded-xl border border-[#70b990] shadow w-full text-center break-all">
+                  {ip}
+                </span>
+                <button
+                  className="mt-2 px-3 sm:px-4 py-2 rounded-lg bg-[#70b990] text-white hover:bg-[#5ca77d] transition text-base font-medium shadow cursor-pointer w-full sm:w-auto"
+                  onClick={handleCopy}
+                  disabled={!ip}
+                >
+                  {copied ? "Copied!" : "Copy IP"}
+                </button>
+              </div>
+              {location && (
+                <>
+                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 w-full text-sm text-gray-700 dark:text-gray-300">
+                    <div className="flex items-center gap-2">
+                      <span role="img" aria-label="city">
+                        🏙️
+                      </span>
+                      <strong>City:</strong> {location.city || "-"}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span role="img" aria-label="region">
+                        🗺️
+                      </span>
+                      <strong>Region:</strong> {location.region || "-"}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span role="img" aria-label="country">
+                        🌍
+                      </span>
+                      <strong>Country:</strong> {location.country_name || "-"}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span role="img" aria-label="isp">
+                        💻
+                      </span>
+                      <strong>ISP:</strong> {location.org || "-"}
+                    </div>
+                  </div>
+                  {location.latitude && location.longitude && (
+                    <div className="mt-6 w-full flex justify-center">
+                      <iframe
+                        title="Google Maps Location"
+                        width="100%"
+                        height="300"
+                        style={{
+                          border: 0,
+                          borderRadius: "12px",
+                          boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
+                        }}
+                        loading="lazy"
+                        allowFullScreen
+                        src={`https://www.google.com/maps?q=${location.latitude},${location.longitude}&z=8&output=embed`}
+                      ></iframe>
+                    </div>
+                  )}
+                </>
+              )}
+            </>
+          )}
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+      <footer className="w-full flex items-center justify-center bg-[#70b990] text-white py-4 mt-6 sm:mt-10 shadow-lg">
+        <span className="text-xs sm:text-sm text-center">
+          © {new Date().getFullYear()} What's My IP. Powered by{" "}
+          <a
+            href="https://www.bitsplease.org"
+            className="underline"
+          >
+            Bits Please Technologies
+          </a>
+        </span>
       </footer>
     </div>
   );
