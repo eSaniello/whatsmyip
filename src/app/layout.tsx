@@ -66,6 +66,8 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <link rel="icon" href="/logo.jpg" type="image/jpeg" />
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4447626162463048"
+          crossOrigin="anonymous"></script>
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
