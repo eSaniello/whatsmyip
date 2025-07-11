@@ -3,6 +3,8 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+
+
 export default function Home() {
   const [ip, setIp] = useState<string>("");
   const [location, setLocation] = useState<any>(null);
