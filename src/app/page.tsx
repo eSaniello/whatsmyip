@@ -3,8 +3,6 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-
-
 export default function Home() {
   const [ip, setIp] = useState<string>("");
   const [location, setLocation] = useState<any>(null);
@@ -127,12 +125,14 @@ export default function Home() {
       </main>
       <footer className="w-full flex items-center justify-center bg-[#70b990] text-white py-4 mt-6 sm:mt-10 shadow-lg">
         <span className="text-xs sm:text-sm text-center">
-          © {new Date().getFullYear()} What's My IP. Powered by{" "}
+          © {new Date().getFullYear()} What's My IP. Proudly developed by{" "}
           <a
             href="https://www.bitsplease.org"
             className="underline"
+            target="_blank"
+            rel="noopener noreferrer"
           >
-            Bits Please Technologies
+            bitsplease.org
           </a>
         </span>
       </footer>
